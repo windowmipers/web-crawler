@@ -15,13 +15,25 @@ function getURLsFromHTML(htmlBody, baseURL) {
     const urls = []
     const dom = new JSDOM(htmlBody)
     const tags = dom.window.document.querySelectorAll('a')
-    for(let tag of tags){
-        const tagObj = new URL(tag)
-        if (tagObj.protocol) {
-            
+    for (const tag of tags) {
+        if (tag.href.slice(0, 1) === '/'){
+            try {
+                const urlObj = new URL(`${baseURL}${tag.href}`)
+                urls.push(`${baseURL}${tag.href}`)
+            } catch (err){
+                console.log(`error with relative url: ${err.message}`)
+            }            
+        } else {
+            try {
+                const urlObj = new URL(tag.href)
+                urls.push(tag.href)
+            } catch (err){
+                console.log(`error with absolute url: ${err.message}`)
+            }
         }
+
     }
-    dom.window.document.querySelector('a').textContent
+    return urls
 
 }
 
@@ -29,5 +41,6 @@ function getURLsFromHTML(htmlBody, baseURL) {
 
 
 module.exports = {
-    normalizeURL
+    normalizeURL,
+    getURLsFromHTML
   }
